@@ -21,7 +21,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
-      - name: Install dependencies
-        run: bundle install
-      - run: bundle exec jekyll build
+      - name: Build the site in the jekyll/builder container
+        run: |
+              docker run \
+              -v ${{ github.workspace }}:/srv/jekyll -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
+               jekyll/builder:latest /bin/bash -c "chmod -R 777 /srv/jekyll && jekyll build --future"
+
       - run: npx percy snapshot _site # snapshot built Jekyll site
